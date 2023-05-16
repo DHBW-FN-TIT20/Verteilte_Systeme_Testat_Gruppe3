@@ -39,7 +39,8 @@ void startServer() {
     // Binden des Sockets an eine IP-Adresse und Port
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    // serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
     serverAddress.sin_port = htons(12345); // Beispielport, hier anpassen wenn gewünscht
 
     if (bind(serverSocket, (sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
@@ -51,6 +52,18 @@ void startServer() {
     if (listen(serverSocket, SOMAXCONN) < 0) {
         std::cerr << "Fehler beim Lauschen auf Verbindungen" << std::endl;
         return;
+    }
+
+    // Ausgabe der Adresse, an der der Server gestartet wurde
+    sockaddr_in addr{};
+    socklen_t addrLength = sizeof(addr);
+    if (getsockname(serverSocket, reinterpret_cast<sockaddr*>(&addr), &addrLength) == -1) {
+        std::cerr << "Fehler beim Abrufen der Serveradresse." << std::endl;
+    } else {
+        char ipAddress[INET_ADDRSTRLEN];
+        std::string ipString = inet_ntoa(addr.sin_addr);
+        strncpy(ipAddress, ipString.c_str(), INET_ADDRSTRLEN);
+        std::cout << "Server gestartet an Adresse: " << ipAddress << std::endl;
     }
 
     std::cout << "Server gestartet. Warte auf Verbindungen..." << std::endl;
@@ -67,25 +80,26 @@ void startServer() {
         }
 
         // Verbindung behandeln (Hier Implementierung der Logik zur Kommunikation mit dem Client)
+        std::cout << "Verbindung!!!" << std::endl;
 
-        // Schließen des Client-Sockets
-        #ifdef _WIN32
-        closesocket(clientSocket);
-        #else
-        close(clientSocket);
-        #endif
-    }
 
-    // Schließen des Server-Sockets
+            // Schließen des Client-Sockets
     #ifdef _WIN32
-    closesocket(serverSocket);
-    WSACleanup();
+    closesocket(clientSocket);
     #else
-    close(serverSocket);
+    close(clientSocket);
     #endif
 }
 
+// Schließen des Server-Sockets
+#ifdef _WIN32
+closesocket(serverSocket);
+WSACleanup();
+#else
+close(serverSocket);
+#endif
+}
 int main() {
-    startServer();
-    return 0;
+startServer();
+return 0;
 }
