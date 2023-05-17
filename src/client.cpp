@@ -1,11 +1,49 @@
 #include <iostream>
 #include <cstring>
 #include <winsock2.h>
+#include <tclap/CmdLine.h>
 
 const int BUFFER_SIZE = 1024;
 const int PORT = 12345;
 
-int main() {
+int main(int argc, char** argv) {
+
+    TCLAP::CmdLine cmd("Command description message", ' ', "0.9");
+    TCLAP::ValueArg<std::string> portArg("", "port", "Port of the server: ", false, "", "string");
+    TCLAP::SwitchArg listenArg("l", "listen", "Listen for incoming connections", false);
+    TCLAP::ValueArg<std::string> topicArg("t", "topic", "Topic to subscribe to", false, "", "string");
+    TCLAP::ValueArg<std::string> untopicArg("u", "untopic", "Topic to unsubscribe from", false, "", "string");
+    TCLAP::MultiArg<std::string> publishArg("p", "publish", "Publish a message", false, "string");
+
+    cmd.add(portArg);
+    cmd.add(listenArg);
+    cmd.add(topicArg);
+    cmd.add(untopicArg);
+    cmd.add(publishArg);
+
+    cmd.parse(argc, argv);
+
+    //use port for every connection
+    if (listenArg.getValue()) {
+        std::cout << "Listening for incoming topics..." << std::endl;
+        // listen for server connections
+    } else if (topicArg.isSet())
+    {
+        // subscribe to topic
+    } else if (untopicArg.isSet())
+    {
+        // unsubscribe from topic
+    } else if (publishArg.isSet())
+    {
+        // publish message
+    } else
+    {
+        std::cout << "No command specified" << std::endl;
+    }
+    
+
+
+
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         std::cerr << "Fehler beim Initialisieren von Winsock." << std::endl;
@@ -59,3 +97,4 @@ int main() {
 
     return 0;
 }
+
