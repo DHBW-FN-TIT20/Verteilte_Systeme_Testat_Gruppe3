@@ -4,9 +4,9 @@
 
 # Ignore build directory
 /src/build/
-
+/build/
 # Ignore Visual Studio Code configuration
-.vscode/
-
+/src/.vscode/
+/.vscode/
 # Ignore CMakeLists.txt
-CMakeLists.txt
+/src/CMakeLists.txt
