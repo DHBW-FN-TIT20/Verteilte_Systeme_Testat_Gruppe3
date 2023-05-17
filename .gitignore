@@ -1,5 +1,13 @@
-# Ignore out
-.out
+# Ignore compiled binaries
+*.out
+*.exe
 
-# Ignore exe
-.exe
+# Ignore build directory
+/src/build/
+/build/
+# Ignore Visual Studio Code configuration
+/src/.vscode/
+/.vscode/
+# Ignore CMakeLists.txt
+/src/CMakeLists.txt
+CMakeLists.txt
