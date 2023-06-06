@@ -67,10 +67,10 @@ SOCKET createSocket()
 int main(int argc, char** argv) {
 
     TCLAP::CmdLine cmd("Publisher/Subscriber System", ' ', "1");
-    TCLAP::SwitchArg listArg ("", "list", "List all topics", false);
-    TCLAP::ValueArg<std::string> portArg("", "port", "Port of the server", false, "", "string");
-    TCLAP::MultiArg<std::string> topicArg("", "topic", "Topic to subscribe to", false, "string");
-    TCLAP::MultiArg<std::string> publishArg("", "publish", "Publish a message to a topic. Syntax: TOPIC:MESSAGE", false, "string");
+    TCLAP::SwitchArg listArg ("", "list", "Liste alle Topics auf", false);
+    TCLAP::ValueArg<std::string> portArg("", "port", "Verbindungsport", false, "", "string");
+    TCLAP::MultiArg<std::string> topicArg("", "topic", "Topic zum abbonieren", false, "string");
+    TCLAP::MultiArg<std::string> publishArg("", "publish", "Veröffentlichung von Topic-Nachrichten Syntax: TOPIC§NACHRICHT", false, "string");
 
     cmd.add(portArg);
     cmd.add(topicArg);
@@ -85,11 +85,11 @@ int main(int argc, char** argv) {
     {
         port = std::stoi(portArg.getValue());
     } else {
-        std::cout << "No port specified. Using standard Port: " + std::to_string(port) << std::endl;
+        std::cout << "Kein Port festgelegt. Verwende Standard Port: " + std::to_string(port) << std::endl;
     }
 
     SOCKET clientSocket = createSocket();
-    std::cout << "Connecting to server address: " + ip + ":" + std::to_string(port) << std::endl;
+    std::cout << "Verbinde zum Server: " + ip + ":" + std::to_string(port) << std::endl;
     connectToServer(clientSocket, ip, port);
 
     if (listArg.isSet())
@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
         if (response) {
             std::cout << buffer << std::endl;
         } else {
-            std::cout << "No response from server" << std::endl;
+            std::cout << "Keine Antwort vom Server" << std::endl;
         }
     } else if (topicArg.isSet())
     {
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
         char* buffer;
         bool response = receiveFromServer(clientSocket, buffer);
         if (!response) {
-            std::cout << "No response from server" << std::endl;
+            std::cout << "Keine Antwort vom Server" << std::endl;
         } else {
             //Ausgabe der Texte
         }
@@ -135,13 +135,13 @@ int main(int argc, char** argv) {
         char* buffer;
         bool response = receiveFromServer(clientSocket, buffer);
         if (!response) {
-            std::cout << "No response from server" << std::endl;
+            std::cout << "Keine Antwort vom Server" << std::endl;
         } else {
             std::cout << buffer << std::endl;
         }
     } else
     {
-        std::cout << "No command specified" << std::endl;
+        std::cout << "Kein Kommando festgelegt" << std::endl;
     }
 
     return 0;
