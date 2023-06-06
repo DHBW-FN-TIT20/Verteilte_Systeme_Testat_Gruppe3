@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     {
         // publish message
         // t$Topic1 m$ Message
-        // $p TOPIC$MESSAGE;TOPIC$MESSAGE etc.;
+        // $p TOPIC§MESSAGE;TOPIC§MESSAGE etc.;
         std::string message = "$p ";
         for (std::string i : publishArg.getValue()) {
             message += i + ";";
