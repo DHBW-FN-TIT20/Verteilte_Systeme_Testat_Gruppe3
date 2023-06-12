@@ -144,10 +144,14 @@ int main(int argc, char** argv) {
         sendToServer(clientSocket, message);
         closeConnection(clientSocket);
         bool response = receiveFromServer(clientSocket, buffer);
-        if (!response) {
-            std::cout << "Keine Antwort vom Server" << std::endl;
-        } else {
-            std::cout << buffer << std::endl;
+        std::cout << "dieser";
+        while(true){
+            if (!response) {
+                std::cout << "Keine Antwort vom Server" << std::endl;
+            } else {
+                std::cout << "buffer: " << buffer << std::endl;
+                continue;
+            }
         }
     } else
     {
