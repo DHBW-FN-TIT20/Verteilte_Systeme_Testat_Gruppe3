@@ -33,8 +33,8 @@ bool sendToServer(SOCKET clientSocket, std::string message)
 
 bool receiveFromServer(SOCKET clientSocket, char* buffer)
 {
-    memset(buffer, 0, BUFFER_SIZE);
-    int bytesRead = recv(clientSocket, buffer, BUFFER_SIZE - 1, 0);
+    int bytesRead;
+    bytesRead = recv(clientSocket, buffer, BUFFER_SIZE - 1, 0);
     if (bytesRead == SOCKET_ERROR) {
         std::cerr << "Fehler beim Empfangen der Daten: " << WSAGetLastError() << std::endl;
         return false;
@@ -42,6 +42,15 @@ bool receiveFromServer(SOCKET clientSocket, char* buffer)
         std::cout << "Antwort vom Server: " << buffer << std::endl;
     }
     return true;
+}
+
+void closeConnection(SOCKET ConnectSocket) {
+    int iResult = shutdown(ConnectSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+    }
 }
 
 SOCKET createSocket()
@@ -80,6 +89,7 @@ int main(int argc, char** argv) {
 
     std::uint16_t port = 12345;
     std::string ip = "127.0.0.1";
+    char buffer[BUFFER_SIZE];
     //use port for every connection
     if (portArg.isSet()) 
     {
@@ -90,14 +100,14 @@ int main(int argc, char** argv) {
 
     SOCKET clientSocket = createSocket();
     std::cout << "Verbinde zum Server: " + ip + ":" + std::to_string(port) << std::endl;
-    connectToServer(clientSocket, ip, port);
+    bool success = connectToServer(clientSocket, ip, port);
 
     if (listArg.isSet())
     {
         // list all topics
         // Message to server: list all
         sendToServer(clientSocket, "$l");
-        char* buffer;
+        closeConnection(clientSocket);
         bool response = receiveFromServer(clientSocket, buffer);
         if (response) {
             std::cout << buffer << std::endl;
@@ -115,7 +125,7 @@ int main(int argc, char** argv) {
         }
         message.pop_back();
         sendToServer(clientSocket, message);
-        char* buffer;
+        closeConnection(clientSocket);
         bool response = receiveFromServer(clientSocket, buffer);
         if (!response) {
             std::cout << "Keine Antwort vom Server" << std::endl;
@@ -132,7 +142,7 @@ int main(int argc, char** argv) {
             message += i + ";";
         }
         sendToServer(clientSocket, message);
-        char* buffer;
+        closeConnection(clientSocket);
         bool response = receiveFromServer(clientSocket, buffer);
         std::cout << "dieser";
         while(true){
