@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     TCLAP::SwitchArg listArg ("", "list", "Liste alle Topics auf", false);
     TCLAP::ValueArg<std::string> portArg("", "port", "Verbindungsport", false, "", "string");
     TCLAP::MultiArg<std::string> topicArg("", "topic", "Topic zum abbonieren", false, "string");
-    TCLAP::MultiArg<std::string> publishArg("", "publish", "Veröffentlichung von Topic-Nachrichten Syntax: TOPIC§NACHRICHT", false, "string");
+    TCLAP::MultiArg<std::string> publishArg("", "publish", "Veröffentlichung von Topic-Nachrichten Syntax: TOPIC#NACHRICHT", false, "string");
 
     cmd.add(portArg);
     cmd.add(topicArg);
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
     {
         // publish message
         // t$Topic1 m$ Message
-        // $p TOPIC§MESSAGE;TOPIC§MESSAGE etc.;
+        // $p TOPIC#MESSAGE;TOPIC#MESSAGE etc.;
         std::string message = "$p ";
         for (std::string i : publishArg.getValue()) {
             message += i + ";";

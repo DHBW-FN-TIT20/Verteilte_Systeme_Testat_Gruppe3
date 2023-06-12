@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <ctime>
 
 enum class SubscribeResult {
     SUCCESS,
@@ -13,24 +14,26 @@ enum class SubscribeResult {
 
 struct TopicStatus {
     std::time_t lastUpdated;
-    std::vector<std::string> subscribers;
+    std::vector<int> subscribers;
 };
 
 class Topic {
 public:
-    Topic(const std::string& name, const std::string& description);
+    Topic(const std::string& name, const std::string& description) : name(name), description(description) {}
 
     SubscribeResult subscribeTopic(const std::string& topicName);
     std::string unsubscribeTopic(const std::string& name);
-    bool publishTopic(const std::string& message);
+    void publishTopic(const std::string& message);
     TopicStatus getTopicStatus(const std::string& topicName);
     void updateTopic(const std::string& message, const std::time_t& timestamp);
+    std::string getName() const{return name;}
+    std::string getDescription() const{return description;}
+    TopicStatus getTopicStatus() const{return topicStatus;}
 
 private:
     std::string name;
     std::string description;
-    std::time_t lastUpdated;
-    std::vector<std::string> subscribers;
+    TopicStatus topicStatus;
     // Add any additional private data members or helper functions here
 };
 

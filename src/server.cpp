@@ -17,17 +17,24 @@
 
 #include "topic.h"
 
+// Die Liste, in welcher unsere Topics gespeichert werden
+std::vector<Topic> topics;
+std::vector<int> connections;
+
 // Function to retrieve the list of available topics
 std::vector<std::string> listTopics()
 {
-    std::vector<std::string> topics;
-
-    // Add sample topics to the list
-    topics.push_back("Topic 1");
-    topics.push_back("Topic 2");
-    topics.push_back("Topic 3");
-
-    return topics;
+        std::vector<std::string> topicNames;
+    
+    if (topics.empty()) {
+        topicNames.push_back("Derzeit keine Topics vorhanden.");
+    } else {
+        for (const Topic& topic : topics) {
+            topicNames.push_back(topic.getName());
+        }
+    }
+    
+    return topicNames;
 }
 
 // Function to send a message through a specific port
@@ -44,12 +51,9 @@ void sendMessage(int socketDescriptor, const std::string& message, const sockadd
         return;
     }
 
-    std::cout << "Message sent successfully" << std::endl;
+    std::cout << "Message: "<< message << " sent successfully" << std::endl;
 }
 
-
-// Globale Map zum Speichern der Topics
-std::map<std::string, Topic> topics;
 
 // ----------------------------------------------------
 // SECTION START SERVER
@@ -108,6 +112,8 @@ void startServer() {
 
     std::cout << "Server gestartet. Warte auf Verbindungen..." << std::endl;
 
+
+
     // Endlosschleife zum Akzeptieren von Verbindungen
     while (true) {
         // Akzeptieren einer eingehenden Verbindung
@@ -116,6 +122,24 @@ void startServer() {
         int clientSocket = accept(serverSocket, (sockaddr*)&clientAddress, &clientAddressSize);
         if (clientSocket < 0) {
             std::cerr << "Fehler beim Akzeptieren der Verbindung" << std::endl;
+            continue;
+        }
+
+        // Bevor wir die Verbindung Akzeptieren 
+
+        int port = ntohs(clientAddress.sin_port);
+        bool portOccupied = false;
+        for (const int& connection : connections) {
+            if (connection == port) {
+                portOccupied = true;
+                break;
+            }
+        }
+
+        if (portOccupied) {
+            std::cerr << "Port " << port << " bereits belegt" << std::endl;
+            sendMessage(clientSocket, "Port belegt", clientAddress);
+            closesocket(clientSocket);
             continue;
         }
 
@@ -130,6 +154,55 @@ void startServer() {
         std::string message(buffer, bytesRead);
         std::cout << "Empfangene Nachricht: " << message << std::endl;
         
+        // Moechte der User Nachrichten publishen
+
+        // Wenn publishen 
+            // Überprüfen ob es dieses Topic schon gibt, sonst neu erstellen
+            // Ansonsten neue Nachricht auf Topic publishen (Funktion aufrufen)
+        size_t startPos = message.find("$p");
+        if (startPos != std::string::npos) {
+            startPos += 3; // Skip "$p"
+            size_t endPos = message.find(";", startPos);
+            while (endPos != std::string::npos) {
+                std::string topicDesc = message.substr(startPos, endPos - startPos);
+                size_t sepPos = topicDesc.find("#");
+                if (sepPos != std::string::npos) {
+                    const std::string& topicName = topicDesc.substr(0, sepPos);
+                    const std::string& topicDescription = topicDesc.substr(sepPos + 1);
+                    bool topicFound = false;
+                    // wenn es das Topic schon gibt, publish topic und verteile an alle subscriber
+                    for (auto topic: topics) {
+                        if(topic.getName() == topicName) {
+                            topicFound = true;
+                            //topic.publishTopic(topicDescription);
+                            auto var = topic.unsubscribeTopic(topicName);
+                        }
+                    }
+                    if(!topicFound){
+                        topics.emplace_back(topicName, topicDescription);
+                    }
+                }
+                startPos = endPos + 1;
+                endPos = message.find(";", startPos);
+            }
+            // Handle the last topic after the last semicolon
+            std::string lastTopicDesc = message.substr(startPos);
+            size_t sepPos = lastTopicDesc.find("#");
+            if (sepPos != std::string::npos) {
+                std::string lastTopicName = lastTopicDesc.substr(0, sepPos);
+                std::string lastTopicDescription = lastTopicDesc.substr(sepPos + 1);
+                topics.emplace_back(lastTopicName, lastTopicDescription);
+            }
+        }
+            // Print the topics
+        for (const Topic& topic : topics) {
+            std::cout << "Topic: " << topic.getName() << "\n";
+            std::cout << "Description: " << topic.getDescription() << "\n";
+            std::cout << "------------\n";
+        }
+
+
+        // Moechte der User alle Topics gelistet haben?
         size_t found = message.find("$l");
         // we found the identifier for listTopics()
         if (found != std::string::npos) {
@@ -143,9 +216,23 @@ void startServer() {
             sendMessage(clientSocket, response, clientAddress);
         }
 
-        // Verbindung behandeln (Hier Implementierung der Logik zur Kommunikation mit dem Client)
-        std::cout << "Verbindung!!!" << std::endl;
-
+        // Moechte der User Topics abbonieren?
+        startPos = message.find(" ");
+        // Array in welchem wir die Topics, welche subscribed werden sollen abonnieren
+        std::vector<std::string> topic_array;
+        if (startPos != std::string::npos) {
+            startPos++; // Skip the space after "$t"
+            size_t endPos = message.find(";", startPos);
+            while (endPos != std::string::npos) {
+                std::string topic = message.substr(startPos, endPos - startPos);
+                topic_array.push_back(topic);
+                startPos = endPos + 1;
+                endPos = message.find(";", startPos);
+            }
+            // Handle the last topic after the last semicolon
+            std::string lastTopic = message.substr(startPos);
+            topic_array.push_back(lastTopic);
+        }
 
             // Schließen des Client-Sockets
     #ifdef _WIN32
