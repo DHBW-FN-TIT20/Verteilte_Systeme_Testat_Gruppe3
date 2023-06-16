@@ -4,6 +4,8 @@ Es soll ein Publisher/Subscriber System im Rahmen der verteilte Systeme Vorlesun
 - TCLAP: Templatized C++ Command Line Parser Library (https://tclap.sourceforge.net/)
 # Client Compilation
 - g++ client.cpp -o client.exe -lstdc++ -lws2_32 -I../libraries/tclap/include
+# Server Compilation
+- g++ server.cpp topic.cpp -o server.exe -lstdc++ -lws2_32
 # Functions
 ## client.exe --list
 Fordert Liste aller Topics vom Server an
@@ -11,8 +13,17 @@ An Server: "$l"
 ## client.exe --topic TOPIC --topic TOPIC2 etc.
 Abonniert die neuesten Informationen der jeweiligen Topics
 An Server: "$t TOPIC1;TOPIC2;..."
-## client.exe --publish TOPIC§NACHRICHT --publish TOPIC2§NAHRICHT2 etc.
+## client.exe --publish TOPIC#NACHRICHT --publish TOPIC2#NAHRICHT2 etc.
 Veröffentlicht eine Nachricht auf dem jeweilgen Topic
-An Server: "$p TOPIC§NACHRICHT;TOPIC2§NACHRICHT2;..."
+An Server: "$p TOPIC#NACHRICHT;TOPIC2#NACHRICHT2;..."
+
+# TODO
+## client.exe --topicStatus TOPICNAME
+Gibt den aktuellen Status eines Topics zurück.
+An Server: "$s TOPICNAME"
+## client.exe --unsub TOPICNAME
+Meldet den Subscriber vom Topic ab. Wenn kein Subscriber mehr auf dieses Topic
+registriert ist, wird dies gelöscht.
+An Server: $u TOPICNAME
 
 - Notiz von Nico: Ich erstelle zum Schluss noch ein makefile

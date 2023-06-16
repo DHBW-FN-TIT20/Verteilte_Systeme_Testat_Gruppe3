@@ -144,12 +144,20 @@ int main(int argc, char** argv) {
         sendToServer(clientSocket, message);
         closeConnection(clientSocket);
         bool response = receiveFromServer(clientSocket, buffer);
-        std::cout << "dieser";
+        auto output = buffer;
+        bool bufferHasChanged = true;
         while(true){
             if (!response) {
                 std::cout << "Keine Antwort vom Server" << std::endl;
             } else {
-                std::cout << "buffer: " << buffer << std::endl;
+                // Wir wollen den Buffer nur einmal anzeigen, wenn er sich ändert.
+                if(output == buffer && bufferHasChanged){
+                    std::cout << "Antwort: " << output << std::endl;
+                    bufferHasChanged = false;
+                } else {
+                    output = buffer;
+                    bufferHasChanged = true;
+                }
                 continue;
             }
         }

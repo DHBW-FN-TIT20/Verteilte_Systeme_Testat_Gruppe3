@@ -1,77 +1,36 @@
 #include "topic.h"
 
-SubscribeResult Topic::subscribeTopic(const std::string& topicName) {
-    // Überprüfe die Gültigkeit der Parameter
-    if (topicName.empty()) {
-        return SubscribeResult::INVALID_PARAMETERS;
-    }
 
-    // Hier erfolgt die Logik zur Registrierung des Subscribers auf das Topic
-    // Überprüfung, ob das Topic bereits existiert oder erstellt werden muss
-    // Registrierung des Subscribers auf das Topic
 
-    // Beispiel: Annahme, dass die Registrierung erfolgreich ist
-    return SubscribeResult::SUCCESS;
+std::string Topic::subscribeTopic(sockaddr_in subscriber) {
+    topicStatus.subscribers.push_back(subscriber);
+    return "Erfolgreich subscribed!";
 }
 
 
-std::string Topic::unsubscribeTopic(const std::string& name) {
-    // Implementiere hier die Logik zur Abmeldung des Subscribers vom Topic
-    // Überprüfe die Parameter, prüfe die Existenz des Topics und entferne die Registrierung
-    // Gib entsprechende Rückgabewerte basierend auf dem Ergebnis zurück
-
-    // Beispielcode:
-    if (name.empty()) {
-        return "Ungültige Parameter";
-    }
-
-    // Überprüfe, ob das Topic existiert und der Subscriber registriert ist
-    //bool topicExists = /* Prüfe, ob das Topic existiert */;
-    //bool registrationExists = /* Prüfe, ob der Subscriber registriert ist */;
-
-    //if (!topicExists || !registrationExists) {
-    //    return "Topic/Registrierung existiert nicht";
-    //}
-
-    // Führe die Abmeldung durch
-    // ...
-
-    return "Erfolgreich von Topic abgemeldet";
+void Topic::unsubscribeTopic(const sockaddr_in& subscriber) {
+    // Verwendung von std::remove_if und std::erase, um das Element zu entfernen
+    topicStatus.subscribers.erase(std::remove_if(topicStatus.subscribers.begin(), topicStatus.subscribers.end(),
+                                                 [&subscriber](const sockaddr_in& elem) {
+                                                     return memcmp(&elem, &subscriber, sizeof(sockaddr_in)) == 0;
+                                                 }),
+                                  topicStatus.subscribers.end());
 }
+
 
 // Funktion zum Publizieren einer Nachricht auf dem Topic
-void Topic::publishTopic(const std::string& message) {
+std::string Topic::publishTopic(const std::string& message) {
 
+    std::string returnString;
     // Überprüfen der Parameter
     if (message.empty()) {
-        std::cout << "Ungültige Parameter" << std::endl;
-        //return false;
+        returnString = "Ungültige Parameter";
+        return returnString;
     }
 
-    //this->description = message;
-    
-    std::cout << "Topic erfolgreich aktualisiert" << std::endl;
-    //return true;
-}
-
-// Funktion, um den aktuellen Status eines Topics abzurufen
-TopicStatus Topic::getTopicStatus(const std::string& topicName) {
-    TopicStatus status;
-
-    // Hier weiter mit der Implementierung, um den Status des Topics abzurufen
-    // status.lastUpdated = ... // Setze den Zeitstempel der Aktualisierung
-    // status.subscribers = ... // Setze die Liste der Subscriber
-
-    return status;
-}
-
-// Funktion zum Übermitteln des Topic-Inhalts an alle Subscriber
-void Topic::updateTopic(const std::string& message, const std::time_t& timestamp) {
-
-    // Aktualisieren der Topic-Nachricht und des Zeitstempels
     this->description = message;
-    this->topicStatus.lastUpdated = timestamp;
-
-    // Übermitteln der Nachricht an alle Subscriber
-    std::cout << "Update für Topic '" << "' wird an alle Subscriber gesendet" << std::endl;
+    this->topicStatus.lastUpdated = getCurrentTime();
+    
+    returnString = "Topic erfolgreich aktualisiert";
+    return returnString;
 }

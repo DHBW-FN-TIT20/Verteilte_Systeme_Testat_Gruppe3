@@ -5,27 +5,26 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include <winsock2.h> // wir speichern eine Liste von Socket-Addressen
+#include <algorithm>
+#include <iterator>
+#include <chrono> // Zeit
+#include <ctime> // Zeit in C
 
-enum class SubscribeResult {
-    SUCCESS,
-    INVALID_PARAMETERS,
-    INTERNAL_ERROR
-};
+
 
 struct TopicStatus {
     std::time_t lastUpdated;
-    std::vector<int> subscribers;
+    std::vector<sockaddr_in> subscribers;
 };
 
 class Topic {
 public:
-    Topic(const std::string& name, const std::string& description) : name(name), description(description) {}
-
-    SubscribeResult subscribeTopic(const std::string& topicName);
-    std::string unsubscribeTopic(const std::string& name);
-    void publishTopic(const std::string& message);
-    TopicStatus getTopicStatus(const std::string& topicName);
-    void updateTopic(const std::string& message, const std::time_t& timestamp);
+    Topic(const std::string& name, const std::string& description)
+        : name(name), description(description), topicStatus({getCurrentTime(), {}}) {}
+    std::string subscribeTopic(sockaddr_in subscriber);
+    void unsubscribeTopic(const sockaddr_in& subscriber);
+    std::string publishTopic(const std::string& message);
     std::string getName() const{return name;}
     std::string getDescription() const{return description;}
     TopicStatus getTopicStatus() const{return topicStatus;}
@@ -34,7 +33,11 @@ private:
     std::string name;
     std::string description;
     TopicStatus topicStatus;
-    // Add any additional private data members or helper functions here
+    std::time_t getCurrentTime() {
+        auto currentTime = std::chrono::system_clock::now();
+        std::time_t time = std::chrono::system_clock::to_time_t(currentTime);
+        return time;
+    }
 };
 
 #endif  // TOPIC_H
