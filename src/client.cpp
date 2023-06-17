@@ -1,9 +1,26 @@
 #include <iostream>
 #include <cstring>
 #include <winsock2.h>
+#include <vector>
+#include <sstream>
 
 const int BUFFER_SIZE = 1024;
 using namespace std;
+
+std::vector<std::string> split(std::string s, std::string delimiter) {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+        token = s.substr (pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back (token);
+    }
+
+    res.push_back (s.substr (pos_start));
+    return res;
+}
 
 bool connectToServer(SOCKET clientSocket, std::string ip, std::uint16_t port)
 {
@@ -92,13 +109,14 @@ int main(int argc, char** argv) {
     while (run) {
         //Namen maximal 32 ASCII-Zeichen; Nachrichten maximal 255 Zeichen
         std::string input = "";
-        input << std::cin;
+        std::cin >> input;
         std::string delimiter = " ";
-        command = input.substr(0, input.find(delimiter));
+        string command = input.substr(0, input.find(delimiter));
         if (command == "list") {
             cout << "test";
             // list all topics
-            // Message to server: list all
+            // Aufruf: list
+            // Message to server: $l
             sendToServer(clientSocket, "$l");
             //closeConnection(clientSocket);
             bool response = receiveFromServer(clientSocket, buffer);
@@ -109,10 +127,10 @@ int main(int argc, char** argv) {
             }
         } else if (command == "topic") {
             // subscribe to topic
-            // $t Topic1;Topic2 etc.
-
-            std::vector<std::string> topics;
+            // Aufruf: topic Topic1 Topic2 etc.
+            // An Server: $t Topic1;Topic2 etc.
             
+            std::vector<std::string> topics = split(input.substr(input.find(delimiter) + 1), " ");
             std::string message = "$t ";
             for (std::string i : topics) {
                 message += i + ";";
@@ -128,10 +146,11 @@ int main(int argc, char** argv) {
             }
         } else if (command == "publish") {
             // publish message
-            // t$Topic1 m$ Message
-            // $p TOPIC§MESSAGE;TOPIC§MESSAGE etc.;
+            // Aufruf: publish Topic1#Message1 Topic2#Message2 etc.
+            // An Server: $p TOPIC#MESSAGE;TOPIC#MESSAGE etc.;
+            std::vector<std::string> publishs = split(input.substr(input.find(delimiter) + 1), " ");
             std::string message = "$p ";
-            for (std::string i : publishArg.getValue()) {
+            for (std::string i : publishs) {
                 message += i + ";";
             }
             sendToServer(clientSocket, message);
@@ -143,7 +162,23 @@ int main(int argc, char** argv) {
                 std::cout << buffer << std::endl;
             }
         } else if (command == "exit") {
+            // exit program
+            // Aufruf: exit
             run = false;
+        } else if (command == "status") {
+            // get topic status
+            // Aufruf: status Topicname
+            // An Server: $s TOPICNAME
+            std::string status = input.substr(input.find(delimiter) + 1);
+            std::string message = "$s ";
+            sendToServer(clientSocket, message);
+        } else if (command == "help") {
+            // Aufruf: help
+            std::cout << "Folgende Befehle sind verfuegbar:" << std::endl;
+            std::cout << "list" << std::endl;
+            std::cout << "topic Topic1 Topic2 etc." << std::endl;
+            std::cout << "publish Topic1#Message1 Topic2#Message2 etc." << std::endl;
+            std::cout << "exit" << std::endl;
         } else {
             std::cout << "Unbekannter Befehl" << std::endl;
         }
