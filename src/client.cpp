@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cstring>
 #include <winsock2.h>
-#include <tclap/CmdLine.h>
 
 const int BUFFER_SIZE = 1024;
+using namespace std;
 
 bool connectToServer(SOCKET clientSocket, std::string ip, std::uint16_t port)
 {
@@ -74,85 +74,81 @@ SOCKET createSocket()
 
 
 int main(int argc, char** argv) {
-
-    TCLAP::CmdLine cmd("Publisher/Subscriber System", ' ', "1");
-    TCLAP::SwitchArg listArg ("", "list", "Liste alle Topics auf", false);
-    TCLAP::ValueArg<std::string> portArg("", "port", "Verbindungsport", false, "", "string");
-    TCLAP::MultiArg<std::string> topicArg("", "topic", "Topic zum abbonieren", false, "string");
-    TCLAP::MultiArg<std::string> publishArg("", "publish", "Veröffentlichung von Topic-Nachrichten Syntax: TOPIC§NACHRICHT", false, "string");
-
-    cmd.add(portArg);
-    cmd.add(topicArg);
-    cmd.add(publishArg);
-    cmd.add(listArg);
-    cmd.parse(argc, argv);
-
     std::uint16_t port = 12345;
     std::string ip = "127.0.0.1";
     char buffer[BUFFER_SIZE];
-    //use port for every connection
-    if (portArg.isSet()) 
-    {
-        port = std::stoi(portArg.getValue());
+    bool run = true;
+    string arg = argv[0];
+    if (argc > 0 && arg.empty() != true) {
+        port = stoi(arg);
     } else {
-        std::cout << "Kein Port festgelegt. Verwende Standard Port: " + std::to_string(port) << std::endl;
+        cout << "Kein Port festgelegt. Verwende Standard Port: " + std::to_string(port) << std::endl;
     }
-
     SOCKET clientSocket = createSocket();
     std::cout << "Verbinde zum Server: " + ip + ":" + std::to_string(port) << std::endl;
     bool success = connectToServer(clientSocket, ip, port);
 
-    if (listArg.isSet())
-    {
-        // list all topics
-        // Message to server: list all
-        sendToServer(clientSocket, "$l");
-        closeConnection(clientSocket);
-        bool response = receiveFromServer(clientSocket, buffer);
-        if (response) {
-            std::cout << buffer << std::endl;
-        } else {
-            std::cout << "Keine Antwort vom Server" << std::endl;
-        }
-    } else if (topicArg.isSet())
-    {
-        // subscribe to topic
-        // $t Topic1;Topic2 etc.
-        std::vector<std::string> topics = topicArg.getValue();
-        std::string message = "$t ";
-        for (std::string i : topics) {
-            message += i + ";";
-        }
-        message.pop_back();
-        sendToServer(clientSocket, message);
-        closeConnection(clientSocket);
-        bool response = receiveFromServer(clientSocket, buffer);
-        if (!response) {
-            std::cout << "Keine Antwort vom Server" << std::endl;
-        } else {
-            //Ausgabe der Texte
-        }
-    } else if (publishArg.isSet())
-    {
-        // publish message
-        // t$Topic1 m$ Message
-        // $p TOPIC§MESSAGE;TOPIC§MESSAGE etc.;
-        std::string message = "$p ";
-        for (std::string i : publishArg.getValue()) {
-            message += i + ";";
-        }
-        sendToServer(clientSocket, message);
-        closeConnection(clientSocket);
-        bool response = receiveFromServer(clientSocket, buffer);
-        if (!response) {
-            std::cout << "Keine Antwort vom Server" << std::endl;
-        } else {
-            std::cout << buffer << std::endl;
-        }
-    } else
-    {
-        std::cout << "Kein Kommando festgelegt" << std::endl;
-    }
 
+    while (run) {
+        //Namen maximal 32 ASCII-Zeichen; Nachrichten maximal 255 Zeichen
+        std::string input = "";
+        input << std::cin;
+        std::string delimiter = " ";
+        command = input.substr(0, input.find(delimiter));
+        if (command == "list") {
+            cout << "test";
+            // list all topics
+            // Message to server: list all
+            sendToServer(clientSocket, "$l");
+            //closeConnection(clientSocket);
+            bool response = receiveFromServer(clientSocket, buffer);
+            if (response) {
+                std::cout << buffer << std::endl;
+            } else {
+                std::cout << "Keine Antwort vom Server" << std::endl;
+            }
+        } else if (command == "topic") {
+            // subscribe to topic
+            // $t Topic1;Topic2 etc.
+
+            std::vector<std::string> topics;
+            
+            std::string message = "$t ";
+            for (std::string i : topics) {
+                message += i + ";";
+            }
+            message.pop_back();
+            sendToServer(clientSocket, message);
+            //closeConnection(clientSocket);
+            bool response = receiveFromServer(clientSocket, buffer);
+            if (!response) {
+                std::cout << "Keine Antwort vom Server" << std::endl;
+            } else {
+                //Ausgabe der Texte
+            }
+        } else if (command == "publish") {
+            // publish message
+            // t$Topic1 m$ Message
+            // $p TOPIC§MESSAGE;TOPIC§MESSAGE etc.;
+            std::string message = "$p ";
+            for (std::string i : publishArg.getValue()) {
+                message += i + ";";
+            }
+            sendToServer(clientSocket, message);
+            //closeConnection(clientSocket);
+            bool response = receiveFromServer(clientSocket, buffer);
+            if (!response) {
+                std::cout << "Keine Antwort vom Server" << std::endl;
+            } else {
+                std::cout << buffer << std::endl;
+            }
+        } else if (command == "exit") {
+            run = false;
+        } else {
+            std::cout << "Unbekannter Befehl" << std::endl;
+        }
+    }
     return 0;
 }
+    
+    
