@@ -4,6 +4,12 @@
 
 std::string Topic::subscribeTopic(sockaddr_in subscriber) {
     topicStatus.subscribers.push_back(subscriber);
+    std::cout<<"Client mit Port: " << ntohs(subscriber.sin_port) << " wurde erfolgreich zur sublist hinzugefuegt\n-----\n";
+    std::cout<<"Liste von Subs: ";
+    for(auto subs: topicStatus.subscribers){
+
+        std::cout<< " - " << ntohs(subs.sin_port);
+    }
     return "Erfolgreich subscribed!";
 }
 
