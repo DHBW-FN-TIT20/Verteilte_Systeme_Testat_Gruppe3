@@ -3,9 +3,33 @@
 #include <winsock2.h>
 #include <vector>
 #include <sstream>
-
+#include <windows.h>
+#include <regex>
 const int BUFFER_SIZE = 1024;
 using namespace std;
+
+
+bool isValidIPAddress(const std::string& address) {
+    // Überprüfung der IP-Adresse mit einer einfachen Regular Expression
+    std::regex ipRegex(R"(\b(?:\d{1,3}\.){3}\d{1,3}\b)");
+    return std::regex_match(address, ipRegex);
+}
+
+bool isValidPort(const std::string& port) {
+    // Überprüfung des Ports auf eine gültige Ganzzahl im Bereich von 1 bis 65535
+    try {
+        int portNumber = std::stoi(port);
+        return (portNumber >= 1 && portNumber <= 65535);
+    } catch (...) {
+        return false;
+    }
+}
+
+// Farbige Textausgaben
+void printColoredText(const std::string& text, int colorCode) {
+    // Escape-Sequenz für die Farbänderung
+    std::cout << "\033[" << colorCode << "m" << text << "\033[0m" << std::endl;
+}
 
 std::vector<std::string> split(std::string s, std::string delimiter) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
@@ -48,13 +72,53 @@ bool sendToServer(SOCKET clientSocket, std::string message)
 }
 bool receiveFromServer(SOCKET clientSocket, char* buffer)
 {
+    int totalBytesRead = 0;
     int bytesRead;
-    bytesRead = recv(clientSocket, buffer, BUFFER_SIZE - 1, 0);
-    if (bytesRead == SOCKET_ERROR) {
-        std::cerr << "Fehler beim Empfangen der Daten: " << WSAGetLastError() << std::endl;
-        return false;
-    } 
+    bool endOfMessage = false;
+
+    while (!endOfMessage) {
+        bytesRead = recv(clientSocket, buffer + totalBytesRead, BUFFER_SIZE - totalBytesRead - 1, 0);
+        if (bytesRead == SOCKET_ERROR) {
+            std::cerr << "Fehler beim Empfangen der Daten: " << WSAGetLastError() << std::endl;
+            return false;
+        }
+        if (bytesRead == 0) {
+            // Die Verbindung wurde geschlossen
+            break;
+        }
+        totalBytesRead += bytesRead;
+        buffer[totalBytesRead] = '\0';
+
+        // Überprüfen, ob das Ende der Nachricht erreicht wurde
+        for (int i = totalBytesRead - bytesRead; i < totalBytesRead; i++) {
+            if (buffer[i] == '\n') {
+                endOfMessage = true;
+                break;
+            }
+        }
+
+        if (endOfMessage) {
+            // Nachricht vollständig empfangen
+            break;
+        }
+
+        if (totalBytesRead >= BUFFER_SIZE - 1) {
+            // Der Puffer ist voll, keine weiteren Daten empfangen
+            break;
+        }
+    }
+
     return true;
+}
+
+bool isAllAscii(const std::string& str)
+{
+    return std::all_of(
+                str.begin(),
+                str.end(),
+                [](const unsigned char& ch){
+                    return ch <= 127;
+                });
 }
 void closeConnection(SOCKET ConnectSocket) {
     int iResult = shutdown(ConnectSocket, SD_SEND);
@@ -81,46 +145,54 @@ SOCKET createSocket()
     }
     return clientSocket;
 }
-int main(int argc, char** argv) {
-    std::uint16_t port = 12345;
-    std::string ip = "127.0.0.1";
+
+
+// Thread-Funktion für den Thread, der auf Nachrichten vom Socket wartet
+DWORD WINAPI receiveThread(LPVOID lpParameter) {
+    SOCKET clientSocket = *(reinterpret_cast<SOCKET*>(lpParameter));
     char buffer[BUFFER_SIZE];
     bool run = true;
-    string arg = argv[0];
-    if (argc > 1) {
-        std::string arg = argv[1];
-        try {
-            port = std::stoi(arg);
-        } catch (const std::invalid_argument& e) {
-            std::cout << "Ungültiges Argument für Port: " << arg << std::endl;
-            return 1;
-        } catch (const std::out_of_range& e) {
-            std::cout << "Überlauf beim Umwandeln des Ports: " << arg << std::endl;
-            return 1;
-        }
-    } else {
-        std::cout << "Kein Port festgelegt. Verwende Standard Port: " << port << std::endl;
-    }
-    SOCKET clientSocket = createSocket();
-    std::cout << "Verbinde zum Server: " + ip + ":" + std::to_string(port) << std::endl;
-
-    bool success = connectToServer(clientSocket, ip, port);
-
-    //  Willkommens Nachricht
-    bool response = receiveFromServer(clientSocket, buffer);
-    if (response) {
-        std::cout << buffer << std::endl;
-    }
-
-    std::cout << "\n------------\nWelchen Befehl moechtest du ausfuehren? Mit \"help\" kannst du dir alle Befehle anzeigen lassen!\n---------\n";
     while (run) {
+        // Empfange Nachricht vom Socket
+        bool response = receiveFromServer(clientSocket, buffer);
+        if (response) {
+            std::string output = std::string("Antwort vom Server: ") + buffer;
+            printColoredText(output, 34);
+        } else {
+            printColoredText("Keine Antwort vom Server. Versuche vielleicht das Programm neu zu starten.", 31);
+            run = false;
+            break;
+        }
+    }
+    return 0;
+}
 
-        // Buffer säubern
-        memset(buffer, 0, sizeof(buffer));
-
+// Thread-Funktion für den Thread, der auf die Benutzereingabe wartet
+DWORD WINAPI userInputThread(LPVOID lpParameter) {
+    SOCKET clientSocket = *(reinterpret_cast<SOCKET*>(lpParameter));
+    bool run = true;
+    std::string input;
+    while (run) {
+        printColoredText("\n------------\nWelchen Befehl moechtest du ausfuehren? Mit \"help\" kannst du dir alle Befehle anzeigen lassen!\n---------\n", 32);
         //Namen maximal 32 ASCII-Zeichen; Nachrichten maximal 255 Zeichen
         std::string input = "";
-        std::cin >> input;
+        // Eingabeaufforderung für Command
+        while (true) {
+            std::getline(std::cin, input);
+
+            if (!isAllAscii(input)) {
+                printColoredText("\n------\nBitte nur ASCII (7 Bit) Zeichen eingeben.", 31);
+                continue;
+            }
+
+            if (input.find(' ') != std::string::npos) {
+                printColoredText("\n------\nBitte keine Leerzeichen eingeben.", 31);
+                continue;
+            }
+
+            // Wenn die Eingabe gültig ist, die Schleife verlassen
+            break;
+        }
         std::string delimiter = ":";
         string command = input.substr(0, input.find(delimiter));
         if (command == "list") {
@@ -128,81 +200,124 @@ int main(int argc, char** argv) {
             // Aufruf: list
             // Message to server: $l
             sendToServer(clientSocket, "$l");
-            //closeConnection(clientSocket);
-            bool response = receiveFromServer(clientSocket, buffer);
-            if (response) {
-                std::cout << buffer << std::endl;
-            } else {
-                std::cout << "Keine Antwort vom Server" << std::endl;
-            }
         } else if (command == "sub") {
-            // subscribe to topic
             // Aufruf: sub:Topic1;Topic2 etc.
             // An Server: $t Topic1;Topic2 etc.
-
             // Extrahiere die Topics aus dem Eingabestring
             size_t pos = input.find(":");
             std::string topicsString = input.substr(pos + 1); // "Topic1;Topic2"
             std::string message = "$t " + topicsString;
             sendToServer(clientSocket, message);
-            //closeConnection(clientSocket);
-            bool response = receiveFromServer(clientSocket, buffer);
-            if (!response) {
-                std::cout << "Keine Antwort vom Server" << std::endl;
-            } else {
-                std::cout << buffer << std::endl;
-            }
+        } else if(command == "unsub"){
+            // Aufruf: unsub:Topic1;Topic2 etc.
+            // An Server: $u Topic1;Topic2 etc.
+            // Extrahiere die Topics aus dem Eingabestring
+            size_t pos = input.find(":");
+            std::string topicsString = input.substr(pos + 1); // "Topic1;Topic2"
+            std::string message = "$u " + topicsString;
+            sendToServer(clientSocket, message);
         } else if (command == "publish") {
-            // publish message
             // Aufruf: publish:Topic1#Message1;Topic2#Message2;etc.
-            // An Server: $p TOPIC#MESSAGE;TOPIC#MESSAGE etc.;
+            // An Server: $p Topic1#Message1;Topic2#Message2 etc.;
             size_t pos = input.find(":");
             std::string publish = input.substr(pos + 1); // "Topic1;Topic2"
             std::string message = "$p ";
+            // Wenn kein Semicolon am Ende, füge an.
             if (!publish.empty() && publish.back() != ';') {
                 message += publish + ";";
             } else {
                 message += publish;
             }
-
             sendToServer(clientSocket, message);
-            //closeConnection(clientSocket);
-            bool response = receiveFromServer(clientSocket, buffer);
-            if (!response) {
-                std::cout << "Keine Antwort vom Server" << std::endl;
-            } else {
-                std::cout << buffer << std::endl;
-            }
         } else if (command == "exit") {
-            // exit program
-            // Aufruf: exit
+            // Programm beenden
             run = false;
         } else if (command == "status") {
-            // get topic status
             // Aufruf: status:Topicname
-            // An Server: $s TOPICNAME
+            // An Server: $s Topicname
             size_t pos = input.find(":");
-            std::string topicsString = input.substr(pos + 1); // "Topic1;Topic2"
+            std::string topicsString = input.substr(pos + 1);
             std::string message = "$s " + topicsString;
             sendToServer(clientSocket, message);
-            bool response = receiveFromServer(clientSocket, buffer);
-            if (!response) {
-                std::cout << "Keine Antwort vom Server" << std::endl;
-            } else {
-                std::cout << buffer << std::endl;
-            }
             
         } else if (command == "help") {
-            // Aufruf: help
-            std::cout << "Folgende Befehle sind verfuegbar:" << std::endl;
-            std::cout << "list" << std::endl;
-            std::cout << "topic Topic1 Topic2 etc." << std::endl;
-            std::cout << "publish Topic1#Message1 Topic2#Message2 etc." << std::endl;
-            std::cout << "exit" << std::endl;
+            auto helpString = "\n----\nFolgende Befehle sind verfuegbar\n- list\n- sub:Topic1;Topic2\n- unsub:Topic1;Topic2\n- publish:Topic1#Nachricht_1;Topic2#Nachricht_2\n- status:Topic\n- exit\n----\n";
+            printColoredText(helpString, 32);
         } else {
-            std::cout << "Unbekannter Befehl" << std::endl;
+            printColoredText("Unbekannter Befehl - gib bitte \"help\" ein um dir alle Befehle anzeigen zu lassen.", 31);        
         }
+
     }
+}
+
+
+int main(int argc, char** argv) {
+    char buffer[BUFFER_SIZE];
+    bool run = true;
+
+    std::string serverAddressInput;
+    std::string portInput;
+
+    // Eingabeaufforderung für die Serveradresse
+    printColoredText("\n------\n(Hinweis: Keine Eingabe benutzt den Standardserver \"127.0.0.1\")\nBitte gib die Addresse an, wo der Server gestartet werden soll: ", 32);
+    std::getline(std::cin, serverAddressInput);
+
+    // Überprüfung der Serveradresse
+    while (!isValidIPAddress(serverAddressInput)) {
+        if (serverAddressInput.empty()) {
+            serverAddressInput = "127.0.0.1";
+            break;
+        }
+        printColoredText("\n------\n(Hinweis: Keine Eingabe benutzt den Standardserver \"127.0.0.1\")\nUngueltige Serveradresse! Bitte erneut eingeben: ", 32);
+        std::getline(std::cin, serverAddressInput);
+    }
+
+    // Eingabeaufforderung für den Port
+    printColoredText("\n-----\n(Hinweis: Keine Eingabe benutzt den Standardport \"12345\")\nBitte gib den Port an, auf dem der Server gestartet werden soll: ", 32);
+    std::getline(std::cin, portInput);
+
+    // Überprüfung des Ports
+    while (!isValidPort(portInput)) {
+        if (portInput.empty()) {
+            portInput = "12345";
+            break;
+        }
+        printColoredText("\n-----\n(Hinweis: Keine Eingabe benutzt den Standardport \"12345\")\nUngueltiger Port! Bitte erneut eingeben: ", 32);
+        std::getline(std::cin, portInput);
+    }
+
+    // Verbinde zum Server
+    SOCKET clientSocket = createSocket();
+    auto output = "Verbinde zum Server: " + serverAddressInput + ":" + portInput;
+    printColoredText(output,32);
+
+    // Hat Verbindung geklappt?
+    bool success = connectToServer(clientSocket, serverAddressInput, std::stoi(portInput));
+    if(!success){
+        printColoredText("Verbindung hat nicht geklappt!", 31);
+        return 0;
+    }
+
+    //  Willkommens Nachricht
+    bool response = receiveFromServer(clientSocket, buffer);
+    if (response) {
+            std::string output = std::string("\nInitialnachricht vom Server: ") + buffer;
+            printColoredText(output, 34);
+    }
+
+    // Erstelle und starte die Threads
+    HANDLE userInputThreadHandle = CreateThread(NULL, 0, userInputThread, &clientSocket, 0, NULL);
+    HANDLE receiveThreadHandle = CreateThread(NULL, 0, receiveThread, &clientSocket, 0, NULL);
+
+    // Warte auf Beendigung der Threads
+    WaitForSingleObject(userInputThreadHandle, INFINITE);
+    WaitForSingleObject(receiveThreadHandle, INFINITE);
+
+    // Schließe Handle der Threads
+    CloseHandle(userInputThreadHandle);
+    CloseHandle(receiveThreadHandle);
+    // Socket ordnungsgemäß beenden
+    closesocket(clientSocket);
     return 0;
 }
     

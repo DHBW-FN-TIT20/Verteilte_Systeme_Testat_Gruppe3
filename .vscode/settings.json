@@ -81,7 +81,10 @@
         "variant": "cpp",
         "xhash": "cpp",
         "xlocbuf": "cpp",
-        "xlocmes": "cpp"
+        "xlocmes": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "future": "cpp"
     },
     "C_Cpp.default.compilerPath": "D:\\MinGW\\bin\\cpp.exe"
 }
