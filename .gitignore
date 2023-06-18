@@ -10,3 +10,4 @@
 /.vscode/
 # Ignore CMakeLists.txt
 /src/CMakeLists.txt
+CMakeLists.txt

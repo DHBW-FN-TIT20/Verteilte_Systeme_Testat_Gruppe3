@@ -1,0 +1,19 @@
+Verbindung von Port: 50902 wurde geschlossen.
+
+---------
+Port Nummer: 50999 ist verbunden und bereit.
+Socket Nummer: 288
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 50999 gesendet
+
+Verbindung von Port: 50999 wurde geschlossen.
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
