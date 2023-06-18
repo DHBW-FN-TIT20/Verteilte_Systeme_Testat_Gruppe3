@@ -81,6 +81,7 @@ void sendMessage(int socketDescriptor, const std::string& message, const sockadd
 // Diese Funktion updated das Topic und schickt dementsprechende Nachrichten an alle Subscriber
 void updateTopic(connections allConnections, Topic& topic){
     std::string response;
+    topic.updateTime();
 
     response += "\n-------\nTopic \"" + topic.getName() + "\" wurde geupdated!\n";
     auto lastUpdated = topic.getLastUpdated();
@@ -97,7 +98,6 @@ void updateTopic(connections allConnections, Topic& topic){
         }
 
     }
-    topic.updateTime();
     return;
 }
 
@@ -357,13 +357,18 @@ void startServer() {
                     auto output = "Verbindung von Port: " + std::to_string(ntohs(allConnections.connections[index].sin_port)) + " wurde geschlossen.";
                     printColoredText(output, 32);
                     // User von allen Topics Unsubscriben
-                    for (auto deleteUserTopic : topics) {
-                        auto subs = deleteUserTopic.getSubscribers();
-                        auto it = std::find_if(subs.begin(), subs.end(), [&](const sockaddr_in& subscriber) {
-                            return isEqualSockaddrIn(subscriber, allConnections.connections[index]);
-                        });
-                        if (it != subs.end()) {
-                            deleteUserTopic.unsubscribeTopic(allConnections.connections[index]);
+                    for (Topic& deleteUserTopic : topics) {
+                        for (auto iterator = topics.begin(); iterator != topics.end(); ) {
+                            auto subs = deleteUserTopic.getSubscribers();
+                            auto it = std::find_if(subs.begin(), subs.end(), [&](const sockaddr_in& subscriber) {
+                                return isEqualSockaddrIn(subscriber, allConnections.connections[index]);
+                            });
+                            if (it != subs.end()) {
+                                deleteUserTopic.unsubscribeTopic(allConnections.connections[index]);
+                                topics.erase(iterator);
+                            } else {
+                                iterator++;
+                            }
                         }
                     }
                     auto itCon = std::begin(allConnections.connections);
@@ -394,7 +399,7 @@ void startServer() {
                                 std::cout << "\n----\n" << topicName << "\n" << topicDescription << "\n--------";
                                 bool topicFound = false;
                                 // wenn es das Topic schon gibt, publish topic und verteile an alle subscriber
-                                for (auto topic: topics) {
+                                for (Topic& topic: topics) {
                                     if(topic.getName() == topicName) {
                                         topicFound = true;
                                         auto returnMsg = topic.publishTopic(topicDescription);
