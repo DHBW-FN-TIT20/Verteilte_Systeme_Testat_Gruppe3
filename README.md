@@ -3,7 +3,7 @@ Es soll ein Publisher/Subscriber System im Rahmen der verteilte Systeme Vorlesun
 # client Libraries
 - TCLAP: Templatized C++ Command Line Parser Library (https://tclap.sourceforge.net/)
 # Client Compilation
-- g++ client.cpp -o client.exe -lstdc++ -lws2_32 -I../libraries/tclap/include
+- g++ client.cpp -o client.exe -lstdc++ -lws2_32 
 # Server Compilation
 - g++ server.cpp topic.cpp -o server.exe -lstdc++ -lws2_32
 # Functions
