@@ -28,7 +28,7 @@ bool isValidPort(const std::string& port) {
 // Farbige Textausgaben
 void printColoredText(const std::string& text, int colorCode) {
     // Escape-Sequenz für die Farbänderung
-    std::cout << "\033[" << colorCode << "m" << text << "\033[0m" << std::endl;
+    std::cout << "\E[" << colorCode << "m" << text << "\E[0m" << std::endl;
 }
 
 std::vector<std::string> split(std::string s, std::string delimiter) {
@@ -157,7 +157,7 @@ DWORD WINAPI receiveThread(LPVOID lpParameter) {
         bool response = receiveFromServer(clientSocket, buffer);
         if (response) {
             std::string output = std::string("Antwort vom Server: ") + buffer;
-            printColoredText(output, 34);
+            printColoredText(output, 44);
         } else {
             printColoredText("Keine Antwort vom Server. Versuche vielleicht das Programm neu zu starten.", 31);
             run = false;
@@ -302,7 +302,7 @@ int main(int argc, char** argv) {
     bool response = receiveFromServer(clientSocket, buffer);
     if (response) {
             std::string output = std::string("\nInitialnachricht vom Server: ") + buffer;
-            printColoredText(output, 34);
+            printColoredText(output, 44);
     }
 
     // Erstelle und starte die Threads

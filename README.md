@@ -20,20 +20,24 @@ Entwickler:
 g++ client.cpp -o client.exe -lstdc++ -lws2_32 -I../libraries/tclap/include
 - Ausführen mit
 ./client
+Alternativ (in Powershell)
+./client | Out-Host
 
 ## Ausführung und Kompilierung Server
 - Kompilieren mit
 g++ server.cpp topic.cpp -o server.exe -lstdc++ -lws2_32
 - Ausführen mit 
 ./server
+Alternativ (in Powershell)
+./server | Out-Host
 
 ## Farbenidentifikation bei Client
-Blau Antwort vom Server
+Blauer Hintergrund Antwort vom Server
 Rot Error
 Grün Info
 
 ## Farbenidentifikation bei Server
-Blau Antwort an einen Client
+Blauer Hintergrund Antwort an einen Client
 Rot Error
 Grün Info
 Cyan Nachrichten vom Client

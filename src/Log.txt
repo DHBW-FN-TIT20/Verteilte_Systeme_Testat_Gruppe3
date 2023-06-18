@@ -17,3 +17,402 @@ Verbindung von Port: 50999 wurde geschlossen.
 ------
 (Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
 Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+-----
+(Hinweis: Keine Eingabe benutzt den Standardport "12345")
+Bitte gib den Port an, auf dem der Server gestartet werden soll: 
+Server gestartet an Adresse: 
+127.0.0.1:12345
+Server gestartet. Warte auf Verbindungen...
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+-----
+(Hinweis: Keine Eingabe benutzt den Standardport "12345")
+Bitte gib den Port an, auf dem der Server gestartet werden soll: 
+Server gestartet an Adresse: 
+127.0.0.1:12345
+Server gestartet. Warte auf Verbindungen...
+
+---------
+Port Nummer: 59170 ist verbunden und bereit.
+Socket Nummer: 220
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59170 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59170 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59170 gesendet
+
+Verbindung von Port: 59170 wurde geschlossen.
+
+---------
+Port Nummer: 59222 ist verbunden und bereit.
+Socket Nummer: 316
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59222 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59222 gesendet
+
+Verbindung von Port: 59222 wurde geschlossen.
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+-----
+(Hinweis: Keine Eingabe benutzt den Standardport "12345")
+Bitte gib den Port an, auf dem der Server gestartet werden soll: 
+Server gestartet an Adresse: 
+127.0.0.1:12345
+Server gestartet. Warte auf Verbindungen...
+
+---------
+Port Nummer: 59279 ist verbunden und bereit.
+Socket Nummer: 296
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59279 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59279 gesendet
+
+Verbindung von Port: 59279 wurde geschlossen.
+
+---------
+Port Nummer: 59282 ist verbunden und bereit.
+Socket Nummer: 308
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59282 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59282 gesendet
+
+Verbindung von Port: 59282 wurde geschlossen.
+
+---------
+Port Nummer: 59287 ist verbunden und bereit.
+Socket Nummer: 304
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59287 gesendet
+
+Verbindung von Port: 59287 wurde geschlossen.
+
+---------
+Port Nummer: 59290 ist verbunden und bereit.
+Socket Nummer: 320
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59290 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59290 gesendet
+
+Verbindung von Port: 59290 wurde geschlossen.
+
+---------
+Port Nummer: 59309 ist verbunden und bereit.
+Socket Nummer: 324
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59309 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59309 gesendet
+
+
+---------
+Port Nummer: 59311 ist verbunden und bereit.
+Socket Nummer: 312
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59311 gesendet
+
+Verbindung von Port: 59311 wurde geschlossen.
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+-----
+(Hinweis: Keine Eingabe benutzt den Standardport "12345")
+Bitte gib den Port an, auf dem der Server gestartet werden soll: 
+Server gestartet an Adresse: 
+127.0.0.1:12345
+Server gestartet. Warte auf Verbindungen...
+
+---------
+Port Nummer: 59317 ist verbunden und bereit.
+Socket Nummer: 300
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59317 gesendet
+
+Verbindung von Port: 59317 wurde geschlossen.
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+-----
+(Hinweis: Keine Eingabe benutzt den Standardport "12345")
+Bitte gib den Port an, auf dem der Server gestartet werden soll: 
+Server gestartet an Adresse: 
+127.0.0.1:12345
+Server gestartet. Warte auf Verbindungen...
+
+---------
+Port Nummer: 59320 ist verbunden und bereit.
+Socket Nummer: 264
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59320 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59320 gesendet
+
+Verbindung von Port: 59320 wurde geschlossen.
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+-----
+(Hinweis: Keine Eingabe benutzt den Standardport "12345")
+Bitte gib den Port an, auf dem der Server gestartet werden soll: 
+Server gestartet an Adresse: 
+127.0.0.1:12345
+Server gestartet. Warte auf Verbindungen...
+
+---------
+Port Nummer: 59324 ist verbunden und bereit.
+Socket Nummer: 304
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59324 gesendet
+
+
+------
+(Hinweis: Keine Eingabe benutzt den Standardserver "127.0.0.1")
+Bitte gib die Addresse an, wo der Server gestartet werden soll: 
+
+-----
+(Hinweis: Keine Eingabe benutzt den Standardport "12345")
+Bitte gib den Port an, auf dem der Server gestartet werden soll: 
+Server gestartet an Adresse: 
+127.0.0.1:12345
+Server gestartet. Warte auf Verbindungen...
+
+---------
+Port Nummer: 59325 ist verbunden und bereit.
+Socket Nummer: 224
+--------
+
+
+Die Nachricht: 
+------------
+Hallo, du bist nun verbunden!
+------------
+ wurde erfolgreich an Port: 59325 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Derzeit keine Topics vorhanden.
+----------
+ wurde erfolgreich an Port: 59325 gesendet
+
+
+---------
+Empfangene Nachricht: $t Pacius;Jasper
+------
+
+
+Die Nachricht: 
+-------
+Topic nicht vorhanden, das Topic "Pacius" wurde neu erstellt.
+
+-------
+Topic nicht vorhanden, das Topic "Jasper" wurde neu erstellt.
+ wurde erfolgreich an Port: 59325 gesendet
+
+
+---------
+Empfangene Nachricht: $u Pacius
+------
+
+
+Die Nachricht: Erfolgreich von Topic abgemeldet wurde erfolgreich an Port: 59325 gesendet
+
+
+---------
+Empfangene Nachricht: $l
+------
+
+
+Die Nachricht: 
+----------
+Liste von Topics:
+- Jasper
+----------
+ wurde erfolgreich an Port: 59325 gesendet
+
+Verbindung von Port: 59325 wurde geschlossen.

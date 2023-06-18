@@ -50,7 +50,7 @@ bool compareSockaddr(const sockaddr_in& addr1, const sockaddr_in& addr2) {
 
 void printColoredText(const std::string& text, int colorCode) {
     // Ausgabe auf der Konsole
-    std::cout << "\033[" << colorCode << "m" << text << "\033[0m" << std::endl;
+    std::cout << "\E[" << colorCode << "m" << text << "\E[0m" << std::endl;
 
     // Ausgabe in der Datei
     std::ostringstream logStream;
@@ -66,12 +66,6 @@ void printColoredText(const std::string& text, int colorCode) {
 
 // Funktion um an ein Client/Socket eine Nachricht zu senden
 void sendMessage(int socketDescriptor, const std::string& message, const sockaddr_in& clientAddress) {
-    const int port = 12345;
-
-    sockaddr_in serverAddress{};
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(port);
-    serverAddress.sin_addr.s_addr = INADDR_ANY;
 
     if (sendto(socketDescriptor, message.c_str(), message.size(), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress)) < 0) {
         std::cerr << "Failed to send message" << std::endl;
@@ -80,7 +74,7 @@ void sendMessage(int socketDescriptor, const std::string& message, const sockadd
 
 
     auto output = "\nDie Nachricht: " + message + " wurde erfolgreich an Port: " + std::to_string(ntohs(clientAddress.sin_port)) + " gesendet\n";
-    printColoredText(output,34);
+    printColoredText(output,44);
     return;
 }
 
